@@ -15,8 +15,27 @@ The database includes the following main tables:
 
 # Technologies Used
 
-- PostgreSQL
+1. Ensure to install all the dependencies listed below:
+    - npm install dotenv
+    - npm install pg
+    - npm install pg-format
 
+2. To run this locally, you'll need an 'airbnc_test' database set up on your machine. You can create it using:
+    - npm run setup-db
+
+This will run the file setup.sql
+
+DROP DATABASE IF EXISTS airbnc_test;
+
+CREATE DATABASE airbnc_test;
+
+3. You'll need to add your database credentials in a .env file located at the root of the project.
+
+PGDATABASE='airbnc_test'
+
+4. To seed the database run following command:
+
+npm run seed
 
 # Author
 
