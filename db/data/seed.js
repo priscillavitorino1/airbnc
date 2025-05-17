@@ -1,6 +1,5 @@
 const db = require("./connection")
-const insertUsers = require("../utils/usersRef.js")
-const insertProperty = require("../utils/propertyRef.js")
+const {formatUsers, userRef, formatProperties} = require("../utils/format.js")
 const format = require("pg-format")
 
 async function seed(propertyTypesData, usersData, propertiesData){
@@ -27,12 +26,12 @@ async function seed(propertyTypesData, usersData, propertiesData){
     
     await db.query(`CREATE TABLE properties (
                     property_id SERIAL PRIMARY KEY,
-                    host_id INT NOT NULL REFERENCES users(user_id),
                     name VARCHAR NOT NULL,
-                    location VARCHAR NOT NULL,
                     property_type VARCHAR NOT NULL REFERENCES property_types(property_type),
+                    location VARCHAR NOT NULL,
                     price_per_night DECIMAL NOT NULL,
-                    description TEXT)`);
+                    description TEXT,
+                    host_id INT NOT NULL REFERENCES users(user_id))`);
     //INSERT
     await db.query(
                     format(`INSERT INTO property_types (property_type, description)
@@ -41,16 +40,19 @@ async function seed(propertyTypesData, usersData, propertiesData){
                             
                         );
 
-    const transformUsers = insertUsers(usersData)
-    await db.query(
+    const formatedUsers = formatUsers(usersData)
+    const {rows: insertedUsers} = await db.query(
                     format(`INSERT INTO users (first_name, surname, email, phone_number, avatar, is_host)
-                            VALUES %L RETURNING *;`, transformUsers.map(({first_name, surname, email, phone_number, avatar, is_host}) => {
+                            VALUES %L RETURNING *;`, formatedUsers.map(({first_name, surname, email, phone_number, avatar, is_host}) => {
                                 return [first_name, surname, email, phone_number, avatar, is_host]})
                             ))
-    
+
+    const usersId = userRef(insertedUsers)
+
+    const formatedProperties = formatProperties(propertiesData, usersId)
     await db.query(
-                    format(`INSERT INTO properties (host_id, name, location, property_type, price_per_night, description)
-                    VALUES %L RETURNING *;`, insertProperty(propertiesData))
+                    format(`INSERT INTO properties (name, property_type, location, price_per_night, description, host_id)
+                    VALUES %L RETURNING *;`, formatedProperties)
                 )
 }
 
