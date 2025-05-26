@@ -1,5 +1,42 @@
-const {formatUsers, userRef, formatProperties} = require("../utils/format.js")
+const {formatUsers, 
+      usersIdRef, 
+      formatProperties, 
+      formatAmenities, 
+      formatPropertiesAmenities,
+      formatImages,
+      formatFavourites,
+      formatReviews,
+      formatBookings} = require("../utils/format.js")
+
 let users = 0
+const mock = jest.fn();
+
+describe("usersIdRef", ()=>{
+  const usersTest =  [
+    {
+      user_id: 2,
+      first_name: 'Bob',
+      surname: 'Smith',
+      email: 'bob@example.com',
+      phone_number: '+44 7000 222222',
+      avatar: 'https://example.com/images/bob.jpg',
+      is_host: false,
+      created_at: '2025-05-26T10:32:53.256Z'
+    }
+  ]
+
+  test("usersIdRef return an object",()=>{
+    expect(typeof usersIdRef(usersTest)).toBe("object")
+  })
+  test("the key object should be the full name",()=>{
+    expect(usersIdRef(usersTest).hasOwnProperty('Bob Smith')).toBe(true)
+  })
+  test("the value of key should be the user id",()=>{
+    const key = 'Bob Smith'
+    const userIdTest = usersIdRef(usersTest)
+    expect(userIdTest[key]).toBe(2)
+  })
+})
 
 describe("formatUsers", ()=>{
     beforeEach(() => {
@@ -15,7 +52,6 @@ describe("formatUsers", ()=>{
     })
     test('should return a property called is_host', () => {
         const result = formatUsers(users)
-        //console.log(result)
         expect(result[0].hasOwnProperty('is_host')).toBe(true)
     });
     test('Property is_hold contains boolean value', () => {
@@ -39,6 +75,46 @@ describe("formatProperties", () =>{
                 "description": "Description of Modern Apartment in City Center.",
                 "host_name": "Alice Johnson",
                 "amenities": ["WiFi", "TV", "Kitchen"]
+            }
+        ]
+        users = [{
+            user_id: 1,
+            first_name: 'Alice',
+            surname: 'Johnson',
+            email: 'alice@example.com',
+            phone_number: '+44 7000 111111',
+            avatar: 'https://example.com/images/alice.jpg',
+            is_host: true,
+            created_at: "2025-05-24T08:45:06.621Z"
+          }]
+    })
+    test("return an array", ()=>{
+        expect(typeof formatProperties(property, users)).toBe('object')
+    })
+    test("Should have an element with host_id value", ()=>{
+        const test = formatProperties(property, users)
+        expect(test[0]).toEqual([
+                                  'Modern Apartment in City Center',
+                                  'Apartment',
+                                  'London, UK',
+                                  120,
+                                  'Description of Modern Apartment in City Center.',
+                                  1
+        ])
+    })
+})
+
+describe("formatAmenities", () => {
+    beforeEach(() => {
+        property = [
+            {
+                "name": "Modern Apartment in City Center",
+                "property_type": "Apartment",
+                "location": "London, UK",
+                "price_per_night": 120.0,
+                "description": "Description of Modern Apartment in City Center.",
+                "host_name": "Alice Johnson",
+                "amenities": ["WiFi", "TV", "Kitchen"]
             },
             {
                 "name": "Cosy Family House",
@@ -46,55 +122,211 @@ describe("formatProperties", () =>{
                 "location": "Manchester, UK",
                 "price_per_night": 150.0,
                 "description": "Description of Cosy Family House.",
-                "host_name": "Alice Johnson",
+                "host_name": "Emma Davis",
                 "amenities": ["WiFi", "Parking", "Kitchen"]
-            }
-        ]
-        hostRef = [{
-            'Alice Johnson': 1,
-            'Bob Smith': 2,
-            'Emma Davis': 3,
-            'Frank White': 4,
-            'Isabella Martinez': 5,
-            'Rachel Cummings': 6
             }]
     })
-    test("return an array", ()=>{
-        expect(typeof formatProperties(property, hostRef)).toBe('object')
+    test ("amenities is an array", ()=> {
+        const test = formatAmenities(property)
+        expect(Array.isArray(test)).toBe(true)
     })
-    test("Should have a property called host_id", ()=>{
-        const test = formatProperties(property, hostRef)
-        expect(test[0].hasOwnProperty('host_id')).toBe(true)
+    test ("array should contain amenities from properties", ()=> {
+      const test = formatAmenities(property)
+      expect(test).toEqual(['WiFi','TV','Kitchen','Parking'])
+  })
+})
+
+describe("formatPropertiesAmenities", () => {
+    beforeEach(() => {
+        property = [
+            {
+                "name": "Modern Apartment in City Center",
+                "property_type": "Apartment",
+                "location": "London, UK",
+                "price_per_night": 120.0,
+                "description": "Description of Modern Apartment in City Center.",
+                "host_name": "Alice Johnson",
+                "amenities": ["WiFi", "TV", "Kitchen"]
+            }]
+        users = [
+                {
+                  user_id: 1,
+                  first_name: 'Alice',
+                  surname: 'Johnson',
+                  email: 'alice@example.com',
+                  phone_number: '+44 7000 111111',
+                  avatar: 'https://example.com/images/alice.jpg',
+                  is_host: true,
+                  created_at: "2025-05-24T08:31:37.677Z"
+                }]
+        propertyId = [
+                      {
+                        property_id: 1,
+                        name: 'Modern Apartment in City Center',
+                        property_type: 'Apartment',
+                        location: 'London, UK',
+                        price_per_night: '120',
+                        description: 'Description of Modern Apartment in City Center.',
+                        host_id: 1
+                      }]
     })
-    test("Should have a property called host_id", ()=>{
-        const test = formatProperties(property, hostRef)
-        expect(test[0].hasOwnProperty('host_id')).toBe(true)
+    test ("property amenities is an array", ()=> {
+        const test = formatPropertiesAmenities(property, users,propertyId)
+        expect(Array.isArray(test)).toBe(true)
     })
-    test('should remove host_name property', () => {
-        const test = formatUsers(property, hostRef)
-        console.log(test)
-        expect(test[0].hasOwnProperty('role')).toBe(false)
-    });
+    test ("amenities array should return arrays with property id and amenities", ()=> {
+      const test = formatPropertiesAmenities(property, users,propertyId)
+      expect(test).toEqual([[1,'WiFi'], 
+                            [1,'TV'], 
+                            [1,'Kitchen']])
+  })
+
+})
+
+describe("formatImages", () => {
+  beforeEach(() => {
+      propertyId = [
+                    {
+                      property_id: 1,
+                      name: 'Modern Apartment in City Center',
+                      property_type: 'Apartment',
+                      location: 'London, UK',
+                      price_per_night: '120',
+                      description: 'Description of Modern Apartment in City Center.',
+                      host_id: 1
+                    }]
+      images = [
+                {
+                  "property_name": "Modern Apartment in City Center",
+                  "image_url": "https://example.com/images/modern_apartment_1.jpg",
+                  "alt_tag": "Alt tag for Modern Apartment in City Center"
+                }
+               ]
+  })
+  test ("images is an array", ()=> {
+      const test = formatImages(images, propertyId)
+      expect(Array.isArray(test)).toBe(true)
+  })
+
+
+
+})
+
+describe("formatFavourites", () => {
+  beforeEach(() => {
+    favourites = [
+                    {
+                      "guest_name": "Bob Smith",
+                      "property_name": "Modern Apartment in City Center"
+                    }
+                  ]
+      propertyId = [
+                    {
+                      property_id: 1,
+                      name: 'Modern Apartment in City Center',
+                      property_type: 'Apartment',
+                      location: 'London, UK',
+                      price_per_night: '120',
+                      description: 'Description of Modern Apartment in City Center.',
+                      host_id: 1
+                    }]
+      guestId = [{
+                user_id: 2,
+                first_name: 'Bob',
+                surname: 'Smith',
+                email: 'bob@example.com',
+                phone_number: '+44 7000 222222',
+                avatar: 'https://example.com/images/bob.jpg',
+                is_host: false,
+                created_at: "2025-05-26T10:32:53.256Z"
+              }]
+ 
+  })
+  test ("Favourites is an array", ()=> {
+      const test = formatFavourites(favourites, guestId, propertyId)
+      expect(Array.isArray(test)).toBe(true)
+  })
+
 
 
 })
 
 
-xdescribe("userRef", () => {
-    const insertedUsers = 
-                        [
-                            {
-                            user_id: 1,
-                            first_name: 'Alice',
-                            surname: 'Johnson',
-                            email: 'alice@example.com',
-                            phone_number: '+44 7000 111111',
-                            avatar: 'https://example.com/images/alice.jpg',
-                            is_host: true,
-                            created_at: '2025-05-17T11:16:23.940Z'
-                            }
-                        ]
+describe("formatReviews", () => {
+  beforeEach(() => {
+    reviews = [
+                {
+                  "guest_name": "Bob Smith",
+                  "property_name": "Modern Apartment in City Center",
+                  "rating": 2,
+                  "comment": "Comment about Modern Apartment in City Center: Too noisy at night, and the apartment felt cramped. Wouldn’t stay again."
+                }
+              ]
+      insertedProperties = [
+                    {
+                      property_id: 1,
+                      name: 'Modern Apartment in City Center',
+                      property_type: 'Apartment',
+                      location: 'London, UK',
+                      price_per_night: '120',
+                      description: 'Description of Modern Apartment in City Center.',
+                      host_id: 1
+                    }]
+      insertedUsers = [{
+                user_id: 2,
+                first_name: 'Bob',
+                surname: 'Smith',
+                email: 'bob@example.com',
+                phone_number: '+44 7000 222222',
+                avatar: 'https://example.com/images/bob.jpg',
+                is_host: false,
+                created_at: "2025-05-26T10:32:53.256Z"
+              }]
+ 
+  })
+  test ("Favourites is an array", ()=> {
+      const test = formatReviews(insertedProperties, insertedUsers, reviews)
+      expect(Array.isArray(test)).toBe(true)
+  })
 
-    //console.log(userRef(insertedUsers))
-    
+})
+
+
+describe("formatBookings", () => {
+  beforeEach(() => {
+    bookings = [
+                {
+                  "property_name": "Modern Apartment in City Center",
+                  "guest_name": "Bob Smith",
+                  "check_in_date": "2025-12-01",
+                  "check_out_date": "2025-12-05"
+                }
+              ]
+      insertedProperties = [
+                    {
+                      property_id: 1,
+                      name: 'Modern Apartment in City Center',
+                      property_type: 'Apartment',
+                      location: 'London, UK',
+                      price_per_night: '120',
+                      description: 'Description of Modern Apartment in City Center.',
+                      host_id: 1
+                    }]
+      insertedUsers = [{
+                user_id: 2,
+                first_name: 'Bob',
+                surname: 'Smith',
+                email: 'bob@example.com',
+                phone_number: '+44 7000 222222',
+                avatar: 'https://example.com/images/bob.jpg',
+                is_host: false,
+                created_at: "2025-05-26T10:32:53.256Z"
+              }]
+ 
+  })
+  test ("Favourites is an array", ()=> {
+      const test = formatBookings(insertedProperties, insertedUsers, bookings)
+      expect(Array.isArray(test)).toBe(true)
+  })
+
 })
