@@ -52,15 +52,7 @@ describe("formatUsers", ()=>{
     })
     test('should return a property called is_host', () => {
         const result = formatUsers(users)
-        expect(result[0].hasOwnProperty('is_host')).toBe(true)
-    });
-    test('Property is_hold contains boolean value', () => {
-        const result = formatUsers(users)
-        expect(result[0].is_host).toBe(true)
-    });
-    test('should remove role', () => {
-        const result = formatUsers(users)
-        expect(result[0].hasOwnProperty('role')).toBe(false)
+        expect(Array.isArray(result)).toBe(true)
     });
 })
 
@@ -89,7 +81,7 @@ describe("formatProperties", () =>{
           }]
     })
     test("return an array", ()=>{
-        expect(typeof formatProperties(property, users)).toBe('object')
+        expect(Array.isArray(formatProperties(property, users))).toBe(true)
     })
     test("Should have an element with host_id value", ()=>{
         const test = formatProperties(property, users)

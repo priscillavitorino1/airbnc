@@ -1,8 +1,10 @@
 function formatUsers(dataUsers){
-    return dataUsers.map(({ role, ...rest }) => ({
+    const usersFomated = dataUsers.map(({ role, ...rest }) => ({
         ...rest,
         is_host: role === 'host'
       }));
+    return usersFomated.map(({first_name, surname, email, phone_number, avatar, is_host}) => {
+        return [first_name, surname, email, phone_number, avatar, is_host]})
 }
 //return an array instead of an object
 
