@@ -17,10 +17,13 @@ function usersIdRef (users) {
   return userId
 }
 
-function formatProperties (dataProperties, usersId) {
-  const userId = usersIdRef(usersId)
+function propertiesIdRef(){
+  
+}
+
+function formatProperties (dataProperties, userRef) {
   return dataProperties.map(({host_name, name, property_type, location, price_per_night, description}) => {
-    const host_id = userId[host_name]
+    const host_id = userRef[host_name]
     return [name, property_type, location, price_per_night, description, host_id]    
 
   });
@@ -43,12 +46,11 @@ function formatAmenities (dataProperties) {
   return amenities
 }
 
-function formatPropertiesAmenities(dataProperties, usersId, propertyId){
+function formatPropertiesAmenities(dataProperties, userRef, propertyId){
     const amenityResult = []
-    const userId = usersIdRef(usersId)
     
     const propertyByHostId = dataProperties.map(({host_name, name, property_type, location, price_per_night, description, amenities}) => {
-                                                  const host_id = userId[host_name]
+                                                  const host_id = userRef[host_name]
                                                   return {name, property_type, location, price_per_night, description, host_id, amenities  }
                                                 });
     propertyId.forEach(property => {
@@ -80,15 +82,14 @@ function formatImages(imagesData, insertedProperties) {
 
 }
 
-function formatFavourites(favouritesData, insertedUsers, insertedProperties){
-  const userId = usersIdRef(insertedUsers)
+function formatFavourites(favouritesData, userRef, insertedProperties){
   const favouritesResult = []
 
   insertedProperties.forEach(property => {
     
     return favouritesData.forEach(favourite => {
       if (favourite.property_name === property.name) {
-        favouritesResult.push([userId[favourite.guest_name], 
+        favouritesResult.push([userRef[favourite.guest_name], 
                               property.property_id]);
       }
     })
@@ -97,8 +98,7 @@ function formatFavourites(favouritesData, insertedUsers, insertedProperties){
 }
 
 
-function formatReviews (insertedProperties, insertedUsers, reviews){
-  const userId = usersIdRef(insertedUsers)
+function formatReviews (insertedProperties, userRef, reviews){
 
   const reviewsResult = []
 
@@ -107,7 +107,7 @@ function formatReviews (insertedProperties, insertedUsers, reviews){
     return reviews.forEach(review => {
       if (review.property_name === property.name) {
         reviewsResult.push([property.property_id,
-                            userId[review.guest_name], 
+                            userRef[review.guest_name], 
                             review.rating,
                             review.comment]);
       }
@@ -116,15 +116,14 @@ function formatReviews (insertedProperties, insertedUsers, reviews){
   return reviewsResult
 }
 
-function formatBookings(insertedProperties, insertedUsers, bookingsData){
-  const userId = usersIdRef(insertedUsers)
+function formatBookings(insertedProperties, userRef, bookingsData){
   const bookingResult = []
 
   insertedProperties.forEach((property)=>{
     return bookingsData.forEach((booking)=>{
       if(booking.property_name && property.name){
         bookingResult.push([property.property_id,
-                            userId[booking.guest_name],
+          userRef[booking.guest_name],
                             booking.check_in_date,
                             booking.check_out_date,
         ])

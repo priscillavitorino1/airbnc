@@ -38,5 +38,21 @@
   {
     "guest_name": "Bob Smith",
     "property_name": "Quaint Cottage in the Hills"
+  },
+  {
+    "guest_name": "Rachel Cummings",
+    "property_name": "Cosy Family House"
+  },
+  {
+    "guest_name": "Frank White",
+    "property_name": "Cosy Family House"
+  },
+  {
+    "guest_name": "Bob Smith",
+    "property_name": "Cosy Family House"
+  },
+  {
+    "guest_name": "Rachel Cummings",
+    "property_name": "Quaint Cottage in the Hills"
   }
 ]
