@@ -24,6 +24,7 @@ const {
 } = require("./data-inserts.js")
 
 
+
 async function seed(propertyTypesData, usersData, propertiesData, imagesData, favouritesData, reviewsData, bookingsData){
     await manageTables();
     

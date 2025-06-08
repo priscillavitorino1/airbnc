@@ -37,6 +37,24 @@ PGDATABASE='airbnc_test'
 
 npm run seed
 
+5. To be able to do requests on the server install express:
+
+npm install express
+
+6. You'll need to install nodemon and run the following command to connect to the server:
+
+npm install nodemon
+
+npm run dev
+
+7. to test:
+
+npm run test
+
+8. install supertest library to test requests made to the server - based on superagent
+
+npm install -D supertest
+
 # Author
 
 Priscilla Vitorino - @priscillavitorino1

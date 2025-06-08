@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS airbnc;
 DROP DATABASE IF EXISTS airbnc_test;
 
+CREATE DATABASE airbnc;
 CREATE DATABASE airbnc_test;

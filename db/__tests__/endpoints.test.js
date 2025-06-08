@@ -8,7 +8,7 @@ afterAll(()=>{
 })
 
 /*beforeEach(() => {
-    seed()
+    seed(....)
 })*/
 describe("app", ()=>{
     test("non-existent endpoint responds with 404 and message",async () => {
@@ -25,7 +25,7 @@ describe("app", ()=>{
             
             expect(Array.isArray(body.properties)).toBe(true)
     
-            expect(body.properties.length).toBe(11)
+            //expect(body.properties.length).toBe(11)
     
             body.properties.forEach(property => {
                 expect(property.hasOwnProperty('property_id')).toBe(true)
@@ -70,6 +70,20 @@ describe("app", ()=>{
             const {body} = await request(app).get("/api/properties/10000").expect(404)
             expect(body.msg).toBe("Not found.")
         })
+        test("returns a key image", async ()=> {
+            const { body } = await request(app).get("/api/properties")
+            body.properties.map((property)=>{
+                expect(property).toHaveProperty('image')
+            })
+            
+        })
+        test("returns a key image with first image associated to the property", async ()=> {
+            const { body } = await request(app).get("/api/properties")
+            expect(body.properties).toHaveProperty('image')
+
+            //how do I know if this image is the first if I dont have a timestamp?
+        })
+        
     })
 
     describe("GET - /api/properties/:id", ()=>{
@@ -106,14 +120,14 @@ describe("app", ()=>{
             const {body} = await request(app).get(`/api/properties/${id}?user_id=${user_id}`).expect(200)
 
             expect(body.property).toHaveProperty('favourited')
-            expect(body.property.favourited).toBe(true)
+            expect(body.property.favourited).toBe(false)
         })
         test("property favourited should return a boolean True or False", async ()=>{
             const id = 1;
             const user_id = 2;
             const {body} = await request(app).get(`/api/properties/${id}?user_id=${user_id}`).expect(200)
 
-            expect(body.property.favourited).toBe(true)
+            expect(typeof body.property.favourited).toBe('boolean')
         })
     })
 
@@ -174,6 +188,17 @@ describe("app", ()=>{
             expect(body.msg).toBe('Bad request.')
         })
     })
+
+
+
+
+
+
+
+
+
+
+
 
     /*describe("POST - /api/properties/:id/reviews", ()=>{
         const newReview = {

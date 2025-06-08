@@ -1,0 +1,34 @@
+{
+  "name": "airbnc",
+  "version": "1.0.0",
+  "description": "This project showcases a database design and implementation for an application, called AirBNC. It simulates key functionalities such as bookings, reviews, favourites, users, properties, images and property types. The aim is to demonstrate skills in relational database design, SQL queries, and backend integration.",
+  "main": "index.js",
+  "scripts": {
+    "test-utils": "jest format",
+    "test": "jest endpoints",
+    "seed": "node ./db/data/seed-run",
+    "seed-prod": "NODE_ENV=production node ./db/data/seed-run",
+    "setup-dbs": "psql -f ./db/data/setup.sql",
+    "dev": "nodemon ./listen.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jest-sorted": "^1.0.15",
+    "pg": "^8.15.6",
+    "pg-format": "^1.0.4"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.1"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "jest-sorted"
+    ]
+  }
+}

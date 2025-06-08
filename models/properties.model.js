@@ -7,10 +7,19 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
         properties.location, 
         properties.price_per_night,   
         CONCAT(users.first_name, ' ', users.surname) AS host,
-        COUNT(favourites.property_id) AS favourite_count
+        COUNT(favourites.property_id) AS favourite_count,
+        image.image_url AS image
         FROM properties
         INNER JOIN users 
         ON properties.host_id = users.user_id
+        LEFT JOIN (
+            SELECT DISTINCT ON (property_id)
+                property_id,
+                image_url
+            FROM images
+            ORDER BY property_id ASC
+            ) AS image
+        ON properties.property_id = image.property_id
         LEFT JOIN favourites 
         ON properties.property_id = favourites.property_id `
     
@@ -41,7 +50,8 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
         properties.location, 
         properties.price_per_night, 
         users.first_name, 
-        users.surname
+        users.surname,
+        image.image_url
         ORDER BY ${sortby} ${order.toUpperCase()};`
     
     
