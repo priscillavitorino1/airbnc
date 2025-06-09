@@ -1,5 +1,7 @@
-const {formatUsers, 
-      usersIdRef, 
+const {
+      formatUsers, 
+      usersIdRef,
+      propertiesIdRef,
       formatProperties, 
       formatAmenities, 
       formatPropertiesAmenities,
@@ -9,7 +11,7 @@ const {formatUsers,
       formatBookings} = require("../utils/format.js")
 
 let users = 0
-const mock = jest.fn();
+
 
 describe("usersIdRef", ()=>{
   const usersTest =  [
@@ -35,6 +37,30 @@ describe("usersIdRef", ()=>{
     const key = 'Bob Smith'
     const userIdTest = usersIdRef(usersTest)
     expect(userIdTest[key]).toBe(2)
+  })
+})
+
+describe("propertyIdRef", ()=>{
+  const propertyTest =  [ {
+    property_id: 18,
+    name: 'Stylish Loft in Shoreditch',
+    property_type: 'Loft',
+    location: 'London, UK',
+    price_per_night: '220',
+    description: 'A modern loft in a trendy area of London, surrounded by street art and restaurants.',
+    host_id: 11
+  }]
+
+  test("propertyIdRef return an object",()=>{
+    expect(typeof propertiesIdRef(propertyTest)).toBe("object")
+  })
+  test("the key object should be the property name",()=>{
+    expect(propertiesIdRef(propertyTest).hasOwnProperty('Stylish Loft in Shoreditch')).toBe(true)
+  })
+  test("the value of key should be the user id",()=>{
+    const key = 'Stylish Loft in Shoreditch'
+    const propertyIdTest = propertiesIdRef(propertyTest)
+    expect(propertyIdTest[key]).toBe(18)
   })
 })
 
@@ -69,23 +95,21 @@ describe("formatProperties", () =>{
                 "amenities": ["WiFi", "TV", "Kitchen"]
             }
         ]
-        users = [{
-            user_id: 1,
-            first_name: 'Alice',
-            surname: 'Johnson',
-            email: 'alice@example.com',
-            phone_number: '+44 7000 111111',
-            avatar: 'https://example.com/images/alice.jpg',
-            is_host: true,
-            created_at: "2025-05-24T08:45:06.621Z"
-          }]
+        users = {
+          'Alice Johnson': 1,
+          'Bob Smith': 2,
+          'Emma Davis': 3,
+          'Frank White': 4,
+          'Isabella Martinez': 5,
+          'Rachel Cummings': 6
+        }
     })
     test("return an array", ()=>{
         expect(Array.isArray(formatProperties(property, users))).toBe(true)
     })
     test("Should have an element with host_id value", ()=>{
-        const test = formatProperties(property, users)
-        expect(test[0]).toEqual([
+        const [test] = formatProperties(property, users)
+        expect(test).toEqual([
                                   'Modern Apartment in City Center',
                                   'Apartment',
                                   'London, UK',

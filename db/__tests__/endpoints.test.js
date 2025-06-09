@@ -1,19 +1,17 @@
 const request = require("supertest")
 const app = require("../../app")
 const db = require("../data/connection")
-//const seed = require("../data/seed")
+const seed = require("../data/seed")
 
-afterAll(()=>{
-    db.end
+
+beforeEach(async () => {
+   await seed()
 })
 
-/*beforeEach(() => {
-    seed(....)
-})*/
 describe("app", ()=>{
     test("non-existent endpoint responds with 404 and message",async () => {
         const { body } = await request(app).get("/api/non-existent-path").expect(404)
-        //expect (body.msg).toBe("Path not found.")
+        expect (body.msg).toBe("Path not found.")
     })
 
     describe("GET - /api/properties", ()=>{

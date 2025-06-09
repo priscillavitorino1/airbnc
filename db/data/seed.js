@@ -8,7 +8,8 @@ const {
         formatFavourites,
         formatReviews,
         formatBookings,
-        usersIdRef
+        usersIdRef,
+        propertiesIdRef
 } = require("../utils/format.js")
 
 const {
@@ -27,18 +28,19 @@ const {
 
 async function seed(propertyTypesData, usersData, propertiesData, imagesData, favouritesData, reviewsData, bookingsData){
     await manageTables();
-    
-    const { rows: insertedPropertyType } = await insertPropertyType(propertyTypesData)
+
+    await insertPropertyType(propertyTypesData)
     
     const formatedUsers = formatUsers(usersData)
     const {rows: insertedUsers} = await insertUsers(formatedUsers)
     
     const userRef = usersIdRef(insertedUsers)
-    //const propertyRef = propertiesIdRef()
 
     const formatedProperties = formatProperties(propertiesData, userRef)
     const {rows: insertedProperties} = await insertProperties(formatedProperties)
     
+    const propertyRef = propertiesIdRef(insertedProperties)
+
     const formatedAmenities = formatAmenities(propertiesData)
     await insertAmenities(formatedAmenities)
     

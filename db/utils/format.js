@@ -17,9 +17,14 @@ function usersIdRef (users) {
   return userId
 }
 
-function propertiesIdRef(){
-  
+function propertiesIdRef(propertiesData){
+  const propertyId = {}
+  propertiesData.map((property) => {
+    propertyId[property.name] = property.property_id
+  })
+  return propertyId
 }
+
 
 function formatProperties (dataProperties, userRef) {
   return dataProperties.map(({host_name, name, property_type, location, price_per_night, description}) => {
@@ -136,7 +141,8 @@ function formatBookings(insertedProperties, userRef, bookingsData){
 
 module.exports = {
                   formatUsers, 
-                  usersIdRef, 
+                  usersIdRef,
+                  propertiesIdRef,
                   formatProperties, 
                   formatAmenities, 
                   formatPropertiesAmenities,
