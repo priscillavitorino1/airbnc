@@ -9,7 +9,8 @@
     "seed": "node ./db/data/seed-run",
     "seed-prod": "NODE_ENV=production node ./db/data/seed-run",
     "setup-dbs": "psql -f ./db/data/setup.sql",
-    "dev": "nodemon ./listen.js"
+    "dev": "nodemon ./listen.js",
+    "start": "node ./listen.js"
   },
   "keywords": [],
   "author": "",
