@@ -2,12 +2,23 @@ const request = require("supertest")
 const app = require("../../app")
 const db = require("../data/connection")
 const seed = require("../data/seed")
-
+const {
+    propertyTypesData, 
+    usersData, 
+    propertiesData, 
+    imagesData,
+    favouritesData,
+    reviewsData,
+    bookingsData
+} = require("../data/test/index")
 
 beforeEach(async () => {
-   await seed()
+   await seed(propertyTypesData, usersData, propertiesData, imagesData, favouritesData, reviewsData, bookingsData)
 })
 
+afterAll(()=>{
+    db.end()
+})
 describe("app", ()=>{
     test("non-existent endpoint responds with 404 and message",async () => {
         const { body } = await request(app).get("/api/non-existent-path").expect(404)
@@ -77,7 +88,11 @@ describe("app", ()=>{
         })
         test("returns a key image with first image associated to the property", async ()=> {
             const { body } = await request(app).get("/api/properties")
-            expect(body.properties).toHaveProperty('image')
+
+            body.properties.map((property)=>{
+                expect(property).toHaveProperty('image')
+            })
+            
 
             //how do I know if this image is the first if I dont have a timestamp?
         })
@@ -118,7 +133,7 @@ describe("app", ()=>{
             const {body} = await request(app).get(`/api/properties/${id}?user_id=${user_id}`).expect(200)
 
             expect(body.property).toHaveProperty('favourited')
-            expect(body.property.favourited).toBe(false)
+            expect(body.property.favourited).toBe(true)
         })
         test("property favourited should return a boolean True or False", async ()=>{
             const id = 1;
@@ -187,18 +202,7 @@ describe("app", ()=>{
         })
     })
 
-
-
-
-
-
-
-
-
-
-
-
-    /*describe("POST - /api/properties/:id/reviews", ()=>{
+    describe("POST - /api/properties/:id/reviews", ()=>{
         const newReview = {
             guest_id: 1,
             rating: 5, 
@@ -208,16 +212,76 @@ describe("app", ()=>{
             const id = 1
             await request(app).post(`/api/properties/${id}/reviews`).send(newReview).expect(201)
         })
-        test("responds with the created review", async() =>{
+        test("responds with the created review id", async() =>{
             const id = 1
             const {body} = await request(app).post(`/api/properties/${id}/reviews`).send(newReview).expect(201)
-            expect(body.review.review_id).toBe(14)
+            expect(body.review.review_id).toBe(12)
+        })
+        test("responds with 400 and msg if no guest_id", async() =>{
+            const id = 1
+            const newReviewId = {
+                rating: 5, 
+                comments: 'test'
+            }
+            const {body} = await request(app).post(`/api/properties/${id}/reviews`).send(newReviewId).expect(400)
+            expect(body.msg).toBe('Not valid.')
         })
     })
+
     describe("PATCH - /api/users/:id", ()=>{
         test("responds with status of 200", async ()=>{
             const id = 1
-            await request(app).patch(`/api/users/${id}`).expect(200)
+            const updateUser = {
+                email: "test@test.com"
+            }
+            await request(app).patch(`/api/users/${id}`).send(updateUser).expect(200)
         })
-    })*/
+        test("responds with same number of users", async() =>{
+            const id = 1
+            const updateUser = {
+                email: "test@test.com"
+            }
+
+            const {body} = await request(app).patch(`/api/users/${id}`).send(updateUser).expect(200)
+            expect(body.user.email).toBe("test@test.com")
+        })
+        test("responds with 404 and msg when valid Id but non-existent", async ()=>{
+            const id = 100000
+            const{body} = await request(app).patch(`/api/users/${id}`).expect(404)
+            expect(body.msg).toBe('Not found.')
+        })
+        test("responds with 400 and msg when id is invalid", async ()=>{
+            const{body} = await request(app).patch('/api/users/invalid-id').expect(400)
+            expect(body.msg).toBe('Bad request.')
+        })
+        test("responds with 403 and msg when try to update id", async ()=>{
+            const id = 1
+            const updateUser = {
+                id: 12
+            }
+            const{body} = await request(app).patch(`/api/users/${id}`).expect(403)
+            expect(body.msg).toBe('Forbidden')
+        })
+    })
+
+    describe("DELETE - /api/reviews/:id", ()=>{
+        test("responds with 204", async () => {
+            const id = 1
+            await request(app).delete(`/api/reviews/${id}`).expect(204)
+        })
+        test("responds with empty object when review deleted", async () => {
+            const id = 1
+            const {body} = await request(app).delete(`/api/reviews/${id}`).expect(204)
+            expect(body).toEqual({})
+        })
+        test("responds with 404 and msg when valid Id but non-existent", async ()=>{
+            const{body} = await request(app).delete('/api/reviews/10000').expect(404)
+            expect(body.msg).toBe('Not found.')
+        })
+        test("responds with 400 and msg when id is invalid", async ()=>{
+            const{body} = await request(app).delete('/api/reviews/invalid-id').expect(400)
+            expect(body.msg).toBe('Bad request.')
+        })
+    })
+        
 }) 

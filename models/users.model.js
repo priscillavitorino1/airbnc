@@ -20,7 +20,6 @@ exports.fetchUserId = async (id) => {
 }
 
 exports.updateUserId = async ({id, first_name, surname, email, phone, avatar}) => {
-    console.log({id, first_name, surname, email, phone, avatar})
     const keys = {first_name, surname, email, phone, avatar}
     const values = Object.entries(keys).filter(([key, value]) => {
         return value !== undefined

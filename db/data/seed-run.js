@@ -12,4 +12,4 @@ const {
 
 seed(propertyTypesData, usersData, propertiesData, imagesData, favouritesData, reviewsData, bookingsData).then(()=>{
     db.end();
-});
+});S
