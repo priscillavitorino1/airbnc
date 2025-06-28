@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./css/style.css" rel="stylesheet">
+    <title>API Roadmap</title>
+</head>
+<body>
+    <header>
+        <h1>Explore Airbnc's API </h1>
+    </header>
+    
+    <section class="properties">
+        <h2>GET /api/properties</h2>
+        <p>Retrieve a complete list of all available properties</p>
+        <h3>Optional queries parameters: </h3>
+        <ul>
+            <li>?maxprice= max cost per night</li>
+            <li>?minprice= min cost per night</li>
+            <li>?sort= cost_per_night | popularity</li>
+            <li>?order= ascending | descending</li>
+            <li>?host= id</li>
+        </ul>
+
+        <h3>Content-Type: application/json</h3>
+        <p>
+            [{
+              "name": "Modern Apartment in City Center",
+              "property_type": "Apartment",
+              "location": "London, UK",
+              "price_per_night": 120.0,
+              "description": "Description of Modern Apartment in City Center.",
+              "host_name": "Alice Johnson",
+              "amenities": ["WiFi", "TV", "Kitchen"]
+            }]
+        </p>
+        <h3>Expected response: </h3>
+        <p>
+           ....
+        </p>
+
+    </section>
+    
+    <section id="post">
+        <h2>POST</h2>
+    </section>
+    <section id="patch">
+        <h2>PATCH</h2>
+    </section>
+    <section id="delete">
+        <h2>DELETE</h2>
+    </section>
+</body>
+</html>

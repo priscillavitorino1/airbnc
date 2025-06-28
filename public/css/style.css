@@ -1,0 +1,12 @@
+body{
+    background-color: #fffbd4;
+    font-family: 'Helvetica';
+}
+
+h1{
+    font-family: 'Courier New', monospace;
+}
+.properties{
+    display: flex;
+    flex-direction: column;
+}
