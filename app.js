@@ -17,6 +17,10 @@ const {
 } = require("./controllers/reviews.controler")
 
 const {
+    getAmenities
+} = require("./controllers/amenities.controller")
+
+const {
     handlePathNotFound,
     handleDataNotFound,
     handleBadRequest
@@ -34,6 +38,8 @@ app.get("/api/properties", getProperties)
 app.get("/api/properties/:id", getPropertyId)
 
 app.get("/api/properties/:id/reviews", getPropertiesReview)
+
+app.get("/api/amenities", getAmenities)
 
 app.get("/api/users/:id", getUserId)
 

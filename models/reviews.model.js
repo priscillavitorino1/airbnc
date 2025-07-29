@@ -8,12 +8,11 @@ exports.fetchPropertiesReview = async (id) =>{
             reviews.rating,
             reviews.created_at,
             CONCAT(users.first_name, ' ', users.surname) AS guests,
-            images.image_url AS guest_avatar
+            users.avatar AS guest_avatar
         FROM reviews
         INNER JOIN users
             ON reviews.guest_id = users.user_id
-        INNER JOIN images
-            ON images.property_id = $1
+        WHERE reviews.property_id = $1
         GROUP BY 
             reviews.review_id,
             reviews.comments,
@@ -21,15 +20,20 @@ exports.fetchPropertiesReview = async (id) =>{
             reviews.created_at,
             users.first_name, 
             users.surname,
-            images.image_url
+            users.avatar
         ORDER BY
             reviews.created_at DESC`,[id])
-        
-        const {rows: average} = await db.query(`SELECT AVG(rating) FROM reviews`)
+
+        let sum = 0
+        reviews.map((review)=>{
+            sum += review.rating
+        })
+        const avg = sum/reviews.length
+
         if (reviews[0] === undefined){
             return Promise.reject({status: 404, msg:"Not found."})
         }
-    return {reviews, average_rating: average[0].avg}
+    return {reviews, average_rating: avg}
 }
 
 exports.addPropertiesReview = async(id, guest_id, rating, comments) => {

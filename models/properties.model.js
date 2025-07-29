@@ -1,6 +1,6 @@
 const db = require("../db/data/connection")
 
-exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order = 'DESC', maxPrice, minPrice, host_id) => {
+exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order = 'DESC', maxPrice, minPrice, host_id, amenity) => {
     let query = `SELECT 
         properties.property_id, 
         properties.name AS property_name, 
@@ -8,7 +8,8 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
         properties.price_per_night,   
         CONCAT(users.first_name, ' ', users.surname) AS host,
         COUNT(favourites.property_id) AS favourite_count,
-        image.image_url AS image
+        image.image_url AS image,
+        ARRAY_AGG(DISTINCT properties_amenities.amenity_slug) AS amenities
         FROM properties
         INNER JOIN users 
         ON properties.host_id = users.user_id
@@ -21,7 +22,9 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
             ) AS image
         ON properties.property_id = image.property_id
         LEFT JOIN favourites 
-        ON properties.property_id = favourites.property_id `
+        ON properties.property_id = favourites.property_id
+        INNER JOIN properties_amenities
+        ON properties_amenities.property_id = properties.property_id `
     
     const value = []
     const optionalQueries = []
@@ -40,10 +43,22 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
         value.push(host_id)
         optionalQueries.push(`users.user_id = $${value.length}`)
     }
+
+    let havingCount = '';
+    if(amenity !== undefined && amenity.length > 0){
+        if(!Array.isArray(amenity)) {
+            amenity = [amenity]
+        }
+        value.push(amenity)
+        optionalQueries.push(`properties_amenities.amenity_slug = ANY($${value.length}) `)
+        value.push(amenity.length)
+        havingCount = `HAVING COUNT(DISTINCT properties_amenities.amenity_slug) = $${value.length} `
+    }
+
     if(optionalQueries.length > 0) {
         query += `WHERE ${optionalQueries.join(' AND ')} `
     }
-    
+
     query += `GROUP BY 
         properties.property_id, 
         properties.name, 
@@ -51,12 +66,17 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
         properties.price_per_night, 
         users.first_name, 
         users.surname,
-        image.image_url
-        ORDER BY ${sortby} ${order.toUpperCase()};`
+        image.image_url 
+        `
     
-    
-    const {rows: properties} = await db.query(query, value)
+    if(havingCount) {
+        query += havingCount
+    }
+        
 
+    query += `ORDER BY ${sortby} ${order.toUpperCase()};`
+
+    const {rows: properties} = await db.query(query, value)
    return properties
 }
 
@@ -69,8 +89,9 @@ exports.fetchPropertyId = async (id, user_id) => {
             properties.price_per_night,
             properties.description,
             CONCAT(users.first_name, ' ', users.surname) AS host,
-            images.image_url AS host_avatar,
-            COUNT(favourites.property_id) AS favourite_count`
+            users.avatar AS host_avatar,
+            COUNT(favourites.property_id) AS favourite_count,
+            ARRAY_AGG(images.image_url) AS images`
     
     if(user_id){
         value.push(user_id)
@@ -97,9 +118,9 @@ exports.fetchPropertyId = async (id, user_id) => {
             properties.location, 
             properties.price_per_night,
             properties.description,
+            users.avatar,
             users.first_name, 
-            users.surname,
-            images.image_url`
+            users.surname`
 
     const {rows: [property]} = await db.query(query, value)
         
