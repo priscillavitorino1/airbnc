@@ -23,7 +23,7 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
         ON properties.property_id = image.property_id
         LEFT JOIN favourites 
         ON properties.property_id = favourites.property_id
-        INNER JOIN properties_amenities
+        LEFT JOIN properties_amenities
         ON properties_amenities.property_id = properties.property_id `
     
     const value = []
@@ -46,13 +46,12 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
 
     let havingCount = '';
     if(amenity !== undefined && amenity.length > 0){
-        if(!Array.isArray(amenity)) {
-            amenity = [amenity]
-        }
-        value.push(amenity)
+        let amenitiesList = Array.isArray(amenity) ? amenity : amenity.split(',')
+        value.push(amenitiesList)
         optionalQueries.push(`properties_amenities.amenity_slug = ANY($${value.length}) `)
-        value.push(amenity.length)
-        havingCount = `HAVING COUNT(DISTINCT properties_amenities.amenity_slug) = $${value.length} `
+        //value.push(amenitiesList.length)
+        console.log(value)
+        //havingCount = `HAVING COUNT(DISTINCT properties_amenities.amenity_slug) = $${value.length} `
     }
 
     if(optionalQueries.length > 0) {
@@ -72,11 +71,12 @@ exports.fetchProperties = async (sortby = 'COUNT(favourites.property_id)', order
     if(havingCount) {
         query += havingCount
     }
-        
+     
 
     query += `ORDER BY ${sortby} ${order.toUpperCase()};`
 
     const {rows: properties} = await db.query(query, value)
+
    return properties
 }
 
@@ -130,4 +130,3 @@ exports.fetchPropertyId = async (id, user_id) => {
 
     return property
 }
-
